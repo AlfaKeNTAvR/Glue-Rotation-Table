@@ -10,21 +10,25 @@ class PinDebouncing
     unsigned long debounce_previous_millis;
     int debounce_time;
 
+    bool pin_state;
+
   PinDebouncing()
   {
     debouce_counter = 0;
     debounce_current_millis = 0;
     debounce_previous_millis = 0;
     debounce_time = 100;
+
+    pin_state = false;
   }
 
   // Функция устранения дребезга контактов
-  bool debouncedRead(int pin_number, int pin_state, int debounce_time)
+  bool debouncedRead(int pin_number, int trigger_state, int debounce_time)
   {
     debounce_current_millis = millis();
       
     // Первый этап проверки пина
-    if(debouce_counter == 0 && digitalRead(pin_number) == pin_state)
+    if(debouce_counter == 0 && digitalRead(pin_number) == trigger_state)
     {
       debounce_previous_millis = debounce_current_millis;
       debouce_counter = 1;
@@ -33,7 +37,7 @@ class PinDebouncing
     // Второй этап проверки пина
     else if(debouce_counter == 1 && debounce_current_millis - debounce_previous_millis >= debounce_time)
     {
-      if(digitalRead(pin_number) == pin_state)
+      if(digitalRead(pin_number) == trigger_state)
       {
         debounce_previous_millis = debounce_current_millis;
         debouce_counter = 2;
@@ -50,7 +54,7 @@ class PinDebouncing
     // Третий этап этап проверки пина
     else if(debouce_counter == 2 && debounce_current_millis - debounce_previous_millis >= debounce_time)
     {
-      if(digitalRead(pin_number) == pin_state)
+      if(digitalRead(pin_number) == trigger_state)
       {
         // Cброс флага срабатывания пина
         debouce_counter = 0;
