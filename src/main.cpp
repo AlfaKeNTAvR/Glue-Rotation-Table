@@ -135,9 +135,10 @@ const int rotation_button_pin = 9;
 const int lift_button_pin = 10;
 const int glue_button_pin = 11;
 
-const int rotation_table_pin = 0;
-const int lift_pin = 1;
-const int glue_pin = 2;
+const int rotation_table_pin = 4;
+const int lift_pin = 6;
+const int glue_pin = 5;
+const int free_pin = 7;
 
 String mode = "WAIT";
 int manual_counter = 0;
@@ -154,13 +155,15 @@ void setup()
   pinMode(rotation_table_pin, OUTPUT);
   pinMode(lift_pin, OUTPUT);
   pinMode(glue_pin, OUTPUT);
+  pinMode(free_pin, OUTPUT);
 
   digitalWrite(rotation_table_pin, LOW);
-  digitalWrite(lift_pin, LOW);
+  digitalWrite(lift_pin, LOW);  
   digitalWrite(glue_pin, LOW);
+  digitalWrite(free_pin, LOW); 
 
   // Задержки по умолчанию
-  rotationTableLiftTimer.timer_delay = 10 * 1000;
+  rotationTableLiftTimer.timer_delay = 20 * 1000;
   glueDelayTimer.timer_delay = 1 * 1000;
   glueActionTimer.timer_delay = 7 * 1000;
 
@@ -180,9 +183,9 @@ void loop()
 
 
       // Расчёт задержек
-      rotationTableLiftTimer.timer_delay = 10 * 1000;
-      glueDelayTimer.timer_delay = 1 * 1000;
-      glueActionTimer.timer_delay = rotationTableLiftTimer.timer_delay - glueDelayTimer.timer_delay;
+      rotationTableLiftTimer.timer_delay = 40 * 1000;
+      glueDelayTimer.timer_delay = 5 * 1000;
+      glueActionTimer.timer_delay = rotationTableLiftTimer.timer_delay - 20 * 1000;
 
       // Установка таймеров
       rotationTableLiftTimer.setTimer();    // Установка таймера стола и пневмоподъёмника
@@ -203,6 +206,7 @@ void loop()
 
       // Включение стола
       digitalWrite(rotation_table_pin, HIGH);
+      manual_counter += 1;
     }
 
     // Проверка нажатия кнопки "УПРАВЛЕНИЕ ЦИЛИНДРОМ"
@@ -212,6 +216,7 @@ void loop()
 
       // Cпуск цилиндра
       digitalWrite(lift_pin, HIGH); 
+      manual_counter += 1;
     }
 
     // Проверка нажатия кнопки "УПРАВЛЕНИЕ КЛЕЕМ"
@@ -221,6 +226,7 @@ void loop()
 
       // Подача клея
       digitalWrite(glue_pin, HIGH); 
+      manual_counter += 1;
     }
   }
 
@@ -312,79 +318,4 @@ void loop()
       mode = "WAIT";
     }
   }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void loop() 
-{
-  if(wait_button_flag == true)
-  {
-    // Проверка нажатия кнопки
-    if(startButton.debouncedRead(start_button_pin, LOW, 50) == true)
-    {
-      // Установка таймера стола и пневмоподъёмника
-      rotationTableLiftTimer.setTimer();
-
-      // Установка таймера задержки подачи клея
-      glueDelayTimer.setTimer();
-
-      // Включение стола
-      digitalWrite(rotation_table_pin, HIGH);
-
-      // Спуск пневмоподъёмника
-      digitalWrite(lift_pin, HIGH);
-
-      // Сброс флага ожидания нажатия кнопки
-      wait_button_flag = false;
-
-      // Установка флага задержки подачи клея
-      glue_delay_flag = true;
-    }
-  }
-
-  else if(wait_button_flag == false)
-  {
-    // Проверка основного таймера цикла
-    if(rotationTableLiftTimer.checkTimer() == true)
-    {
-      // Выключение клея (чтобы гарантировать выключение клея при завершении цикла)
-      digitalWrite(glue_pin, LOW);
-
-      // Выключение стола
-      digitalWrite(rotation_table_pin, LOW);
-
-      // Подъём пневмоподъёмника
-      digitalWrite(lift_pin, LOW);
-
-      // Установка флага ожидания нажатия кнопки
-      wait_button_flag = true;
-    }
-
-    else
-    {
-      if(glueDelayTimer.checkTimer() == true)
-
-
-    }
-
-  }
-
 }
