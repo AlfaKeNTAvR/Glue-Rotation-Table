@@ -184,10 +184,10 @@ void setup()
 void loop()
 {
   // Сброс кнопок в состоянии "OFF", если не нажаты
-  startButton.debouncedRead(start_button_pin, HIGH, 50)
-  rotationButton.debouncedRead(rotation_button_pin, HIGH, 50)
-  liftButton.debouncedRead(lift_button_pin, HIGH, 50)
-  glueButton.debouncedRead(glue_button_pin, HIGH, 50)
+  startButton.debouncedRead(start_button_pin, HIGH, 50);
+  rotationButton.debouncedRead(rotation_button_pin, HIGH, 50);
+  liftButton.debouncedRead(lift_button_pin, HIGH, 50);
+  glueButton.debouncedRead(glue_button_pin, HIGH, 50);
 
 
   if(mode == "WAIT")
