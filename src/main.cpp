@@ -10,7 +10,8 @@ class PinDebouncing
     unsigned long debounce_previous_millis;
     int debounce_time;
 
-    int pin_state;
+    int off_state;
+    String pin_state;
 
   PinDebouncing()
   {
@@ -19,7 +20,8 @@ class PinDebouncing
     debounce_previous_millis = 0;
     debounce_time = 100;
 
-    pin_state = HIGH;
+    off_state = HIGH;
+    pin_state = "OFF";
   }
 
   // Функция устранения дребезга контактов
@@ -60,8 +62,9 @@ class PinDebouncing
         debouce_counter = 0;
 
         // Cменя состояния пина
-        pin_state = trigger_state;
-  
+        if(trigger_state == off_state) pin_state = "OFF";
+        else pin_state = "TRIGGERED";
+          
         // Выход из функции по завершению
         return true;            
       }
@@ -74,11 +77,9 @@ class PinDebouncing
       }
     }
 
-    // Cменя состояния пина
-    pin_state = !trigger_state;
-  
-     return false;
-  }   
+    return false;
+  } 
+
 };
 
 class Timer
@@ -182,10 +183,17 @@ void setup()
 
 void loop()
 {
+  // Сброс кнопок в состоянии "OFF", если не нажаты
+  startButton.debouncedRead(start_button_pin, HIGH, 50)
+  rotationButton.debouncedRead(rotation_button_pin, HIGH, 50)
+  liftButton.debouncedRead(lift_button_pin, HIGH, 50)
+  glueButton.debouncedRead(glue_button_pin, HIGH, 50)
+
+
   if(mode == "WAIT")
   {
     // Проверка нажатия кнопки "ПУСК"
-    if(startButton.debouncedRead(start_button_pin, LOW, 50) == true && startButton.pin_state == HIGH)
+    if(startButton.debouncedRead(start_button_pin, LOW, 50) == true && startButton.pin_state == "OFF")
     {
       mode = "AUTO";
 
@@ -210,7 +218,7 @@ void loop()
     }
 
     // Проверка нажатия кнопки "ВРАЩЕНИЕ СТОЛА"
-    else if(rotationButton.debouncedRead(rotation_button_pin, LOW, 50) == true && rotationButton.pin_state == HIGH)
+    else if(rotationButton.debouncedRead(rotation_button_pin, LOW, 50) == true && rotationButton.pin_state == "OFF")
     {
       mode = "MANUAL";
 
@@ -220,7 +228,7 @@ void loop()
     }
 
     // Проверка нажатия кнопки "УПРАВЛЕНИЕ ЦИЛИНДРОМ"
-    else if(liftButton.debouncedRead(lift_button_pin, LOW, 50) == true && liftButton.pin_state == HIGH)
+    else if(liftButton.debouncedRead(lift_button_pin, LOW, 50) == true && liftButton.pin_state == "OFF")
     {
       mode = "MANUAL";
 
@@ -230,7 +238,7 @@ void loop()
     }
 
     // Проверка нажатия кнопки "УПРАВЛЕНИЕ КЛЕЕМ"
-    else if(glueButton.debouncedRead(glue_button_pin, LOW, 50) == true && glueButton.pin_state == HIGH)
+    else if(glueButton.debouncedRead(glue_button_pin, LOW, 50) == true && glueButton.pin_state == "OFF")
     {
       mode = "MANUAL";
 
@@ -275,7 +283,7 @@ void loop()
   else if(mode == "MANUAL")
   {
     // Проверка нажатия кнопки "ВРАЩЕНИЕ СТОЛА"
-    if(rotationButton.debouncedRead(rotation_button_pin, LOW, 50) == true && rotationButton.pin_state == HIGH)
+    if(rotationButton.debouncedRead(rotation_button_pin, LOW, 50) == true && rotationButton.pin_state == "OFF")
     {
       if(digitalRead(rotation_table_pin) == LOW)
       {
@@ -291,7 +299,7 @@ void loop()
     }
 
     // Проверка нажатия кнопки "УПРАВЛЕНИЕ ЦИЛИНДРОМ"
-    else if(liftButton.debouncedRead(lift_button_pin, LOW, 50) == true && liftButton.pin_state == HIGH)
+    else if(liftButton.debouncedRead(lift_button_pin, LOW, 50) == true && liftButton.pin_state == "OFF")
     {
       if(digitalRead(lift_pin) == LOW)
       {
@@ -307,7 +315,7 @@ void loop()
     }
 
     // Проверка нажатия кнопки "УПРАВЛЕНИЕ КЛЕЕМ"
-    else if(glueButton.debouncedRead(glue_button_pin, LOW, 50) == true && glueButton.pin_state == HIGH)
+    else if(glueButton.debouncedRead(glue_button_pin, LOW, 50) == true && glueButton.pin_state == "OFF")
     {
       if(digitalRead(glue_pin) == LOW)
       {
