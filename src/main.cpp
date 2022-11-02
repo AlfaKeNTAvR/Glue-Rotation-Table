@@ -265,7 +265,6 @@ void loop()
   liftButton.updatePinState(lift_button_pin);
   glueButton.updatePinState(glue_button_pin);
 
-
   // Состояние ожидания нажатия кнопок
   if(mode == "WAIT")
   {
